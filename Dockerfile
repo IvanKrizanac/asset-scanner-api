@@ -1,8 +1,8 @@
-
 FROM python:3.10-slim
 
 WORKDIR /app
 
+# System-Abhängigkeiten installieren (für Playwright + Chromium)
 RUN apt-get update && apt-get install -y \
     wget \
     libnss3 \
@@ -20,12 +20,15 @@ RUN apt-get update && apt-get install -y \
     libxtst6 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Python-Abhängigkeiten installieren
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Wichtig: Playwright mit Chromium installieren
+# Playwright + Chromium installieren
 RUN python -m playwright install --with-deps chromium
 
+# App-Code kopieren
 COPY . .
 
+# Startbefehl
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
